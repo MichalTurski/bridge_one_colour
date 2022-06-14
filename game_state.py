@@ -33,6 +33,7 @@ def _try_possibilities(game_state: GameState) -> bool:
     if not my_cards:
         state_copy = deepcopy(game_state)
         state_copy.current_trick.append(0)
+        state_copy.current_player = (state_copy.current_player + 1) % 4
         return score_state(state_copy)  # No choice, nothing to copy
     else:
         for idx, card in enumerate(my_cards):

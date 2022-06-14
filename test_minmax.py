@@ -51,3 +51,13 @@ def test_impasse_incorrectly_played():
                            current_trick=[13],
                            current_player=1)
     assert score_state(game_state) == False
+
+
+def test_empty_W_hand():
+    game_state = GameState(table_state=[[13, 10, 9, 8, 7, 6],
+                           [],
+                           [5, 4, 2, 1],
+                           [3, 12]],
+                           current_player=1,
+                           current_trick=[11])
+    assert score_state(game_state) == False
