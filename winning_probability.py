@@ -31,15 +31,40 @@ def get_state_probability(
 
 
 def get_move_possibilities(state):
+    """
+    Return list of possible moves of a current player in a given incomplete state.
+    If user has consecutive cards, only one maximal is returned (since they are equivalent).
+    If player has unknown cards, all unassigned cards are possible to play.
+    """
     possible_players = [0, 2] if state.current_player == -1 else [state.current_player]
+    table_state = deepcopy(state).table_state
     possibilities = []
     for player in possible_players:
         possibilities = possibilities + [
             (player, card)
-            for card in state.table_state[player]
-            if card + 1 not in state.table_state[player]
+            for card in table_state[player]
+            if card + 1 not in table_state[player]
         ]
+    if len(possibilities) == 0:
+        possibilities = [(possible_players[0], 0)]
+
+    if possible_players == [[1]]:
+        if (
+            state.nb_unknown_cards_op0
+            if possible_players == [1]
+            else state.nb_unknown_cards_op1
+        ) > 0:
+            possibilities += [
+                (possible_players[0], card) for card in state.unassigned_cards
+            ]
     return possibilities
+
+
+def remove(list, element):
+    """
+    Removes an element from the list
+    """
+    return [x for x in list if x != element]
 
 
 def calculate_winning_probabilities(incomplete_state):
@@ -53,8 +78,8 @@ def calculate_winning_probabilities(incomplete_state):
     next_move_win_prob = {}
 
     for move in get_move_possibilities(incomplete_state):
-        state = deepcopy(incomplete_state.table_state)
-        state[move[0]].remove(move[1])
+        state = deepcopy(incomplete_state).table_state
+        state[move[0]] = remove(state[move[0]], move[1])
         print(f"If you play {move[1]} the following scenarios are possible:")
 
         for nb_new_cards_op0 in range(
@@ -99,7 +124,11 @@ def calculate_winning_probabilities(incomplete_state):
     winning_probabilities = dict(
         sorted(next_move_win_prob.items(), key=lambda item: -item[1])
     )
+
     print(
+        f"SUMMARY\n"
+        f"Current game state: {incomplete_state}\n\n"
         f"Depending on your move you have the following winning probability: {winning_probabilities}"
     )
+
     return winning_probabilities
