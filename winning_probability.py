@@ -30,6 +30,13 @@ def get_state_probability(
     ) / math.comb(nb_unknown_cards, nb_unknown_cards_op0)
 
 
+def remove(list, element):
+    """
+    Removes an element from the list
+    """
+    return [x for x in list if x != element]
+
+
 def get_move_possibilities(state):
     """
     Return list of possible moves of a current player in a given incomplete state.
@@ -48,23 +55,23 @@ def get_move_possibilities(state):
     if len(possibilities) == 0:
         possibilities = [(possible_players[0], 0)]
 
-    if possible_players == [[1]]:
-        if (
-            state.nb_unknown_cards_op0
-            if possible_players == [1]
-            else state.nb_unknown_cards_op1
-        ) > 0:
+    if possible_players == [1]:
+        if state.nb_unknown_cards_op0 > 0:
             possibilities += [
                 (possible_players[0], card) for card in state.unassigned_cards
             ]
+            if state.nb_unknown_cards_op1 == 0:
+                possibilities = remove(possibilities, ((possible_players[0], 0)))
+
+    if possible_players == [3]:
+        if state.nb_unknown_cards_op1 > 0:
+            possibilities += [
+                (possible_players[0], card) for card in state.unassigned_cards
+            ]
+            if state.nb_unknown_cards_op0 == 0:
+                possibilities = remove(possibilities, (possible_players[0], 0))
+
     return possibilities
-
-
-def remove(list, element):
-    """
-    Removes an element from the list
-    """
-    return [x for x in list if x != element]
 
 
 def calculate_winning_probabilities(incomplete_state):
