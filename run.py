@@ -9,6 +9,13 @@ from game_state import _score_trick
 import json
 from copy import deepcopy
 
+SIDE = {
+    0: 'S',
+    1: 'W',
+    2: 'N',
+    3: 'E'
+}
+
 
 def parse_args():
     parser = ArgumentParser()
@@ -22,19 +29,39 @@ def parse_args():
     return args
 
 
-def get_input_out_of_choices(choices):
+def print_current_trick(game_state: IncompleteGameState):
+    trick_printable = []
+    player = game_state.current_player
+    for card in game_state.current_trick:
+        player = (player - 1) % 4
+        trick_printable.append(f'{card} from {SIDE[player]}')
+    print(f'Current trick is {trick_printable}')
+
+    next_player = SIDE[game_state.current_player] if game_state.current_player > 0 else 'N or S'
+    print(f'Now {next_player} moves.')
+
+
+def get_input_out_of_choices(choices, player):
     """
     Asks user for an integer input until user provide choice out of choices.
     :param choices: list of accepted user inputs
     """
+    possible_cards = [c[0] for c in choices]
+    plays = [f'{c[0]} (from {c[1]})' for c in choices]
     output = None
+
+    if player in {1, 3}:
+        print('Pick OPPONENT card.')
+    else:
+        print('Pick YOUR card.')
+
     while True:
-        print(f"Please provide a card to play (possible choices: {choices})")
+        print(f"Please provide a card to play (possible choices: {plays})")
         try:
             output = int(input())
         except Exception:
-            print(f"Please provide integer from {choices}")
-        if output in choices:
+            print(f"Please provide integer from {plays}")
+        if output in possible_cards:
             return output
 
 
@@ -104,9 +131,10 @@ def main():
         if state.current_player in [-1, 0, 2]:
             calculate_winning_probabilities(state)
 
-        possible_cards = [move[1] for move in get_move_possibilities(state)]
+        print_current_trick(state)
+        possible_cards = [(move[1], SIDE[move[0]]) for move in get_move_possibilities(state)]
 
-        played_card = get_input_out_of_choices(choices=possible_cards)
+        played_card = get_input_out_of_choices(choices=possible_cards, player=state.current_player)
         played_move = get_played_move(state, played_card)
         state, is_lost = make_move(state=state, move=played_move)
 
