@@ -33,7 +33,6 @@ def generate_possible_states(state: IncompleteGameState) -> list[GameState]:
             new_state = GameState(deepcopy(state.table_state), deepcopy(state.current_player), deepcopy(state.current_trick))
             new_state.table_state[1].extend(player_1_cards)
             new_state.table_state[3].extend(player_3_cards)
-            state_probability = 0.2
             state_probability = get_state_probability(
                 player_1_len,
                 len(state.unassigned_cards) - player_1_len,
