@@ -13,3 +13,11 @@ To test it on predefined example write:
 ```bash
    make demo
    ```
+
+In the new version (2023) we weakened the assumptions of full knowledge of all players: 
+- we assume only that our opponents have full knowledge,
+- we have only a partial knowledge and we gain a full knowledge after the first trick.
+To test it on predefined example write:
+```bash
+   make demo_wo_full_visibility
+   ```
